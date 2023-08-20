@@ -1,64 +1,41 @@
-#include<iostream>
-#include<bits/stdc++.h>
-#include<vector>
-
+#include <bits/stdc++.h>
 using namespace std;
-
-bool isSafe(int row, int col, vector<int>& solution) {
-    for (int prevRow = 0; prevRow < row; ++prevRow) {
-        if (solution[prevRow] == col || abs(solution[prevRow] - col) == abs(prevRow - row)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-void solveNQueens(int n, int row, vector<int>& solution, vector<vector<int>>& solutions) {
-    if (row == n) {
-        solutions.push_back(solution);
-        return;
-    }
-
-    for (int col = 0; col < n; ++col) {
-        if (isSafe(row, col, solution)) {
-            solution[row] = col;
-            solveNQueens(n, row + 1, solution, solutions);
-        }
-    }
-}
-
-void printSolution(const vector<vector<int>>& solutions) {
-    for (const vector<int>& solution : solutions) {
-        for (int col : solution) {
-            for (int i = 0; i < solution.size(); ++i) {
-                if (i == col) {
-                    cout << "Q ";
-                } else {
-                    cout << ". ";
-                }
-            }
-            cout << endl;
-        }
-        cout << endl;
-    }
-}
-
+void solve(int row, int n, vector<string> &board, vector<vector<string>>&ans,vector<int> &leftDiagonal, vector<int> &upperCol, vector<int>&rightDiagonal);
 int main() {
-    int n;
-    cout << "Enter the value of N (number of queens): ";
-    cin >> n;
+ int n;
+ cout << "Enter the number of queens: "; cin >> n;
+ vector<string> board(n, string(n, '*'));
+ vector<vector<string>> ans;
+ vector<int> leftDiagonal(2 * n - 1, 0), upperCol(n, 0),rightDiagonal(2 * n - 1, 0);
+ solve(0, n, board, ans, leftDiagonal, upperCol, rightDiagonal);
+ for(auto Board: ans) {
+ for(int i = 0; i < n; ++i) {
+ for(int j = 0; j < n; ++j)
+ cout << Board[i][j] << " ";
+ cout << endl;
+ }
+ cout << endl;
+ }
+ return 0;
+}
 
-    vector<vector<int>> solutions;
-    vector<int> solution(n, -1);
+void solve(int row, int n, vector<string> &board, vector<vector<string> >&ans,vector<int> &leftDiagonal, vector<int> &upperCol, vector<int>&rightDiagonal) {
+ if(row == n) {
+ ans.push_back(board);
+ return;
+ }
 
-    solveNQueens(n, 0, solution, solutions);
-
-    if (solutions.empty()) {
-        cout << "No solutions found." << endl;
-    } else {
-        cout << "Found " << solutions.size() << " solutions:" << endl;
-        printSolution(solutions);
-    }
-
-    return 0;
+ for(int col = 0; col < n; ++col) {
+ if(!leftDiagonal[n - 1 + col - row] && !upperCol[col] &&!rightDiagonal[row + col]) {
+ board[row][col] = 'Q';
+ leftDiagonal[n - 1 + col - row] = 1;
+ upperCol[col] = 1;
+ rightDiagonal[row + col] = 1;
+ solve(row + 1, n, board, ans, leftDiagonal, upperCol,rightDiagonal);
+ board[row][col] = '*';
+ leftDiagonal[n - 1 + col - row] = 0;
+ upperCol[col] = 0;
+ rightDiagonal[row + col] = 0;
+ }
+ }
 }
